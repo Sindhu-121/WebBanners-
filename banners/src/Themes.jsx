@@ -12,20 +12,39 @@ const Themes = () => {
   const { color } = useParams();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const fontColor = queryParams.get('fontColor');
-  const fontWeight = queryParams.get('fontWeight');
+  const defaultBackgroundColor = color || 'white'; // Default background color
 
   const [fontFamily, setFontFamily] = useState('Arial, sans-serif');
   const [fontSize, setFontSize] = useState(24); // Default font size
-  const [backgroundColor, setBackgroundColor] = useState(color || 'white'); // Default background color
+  const [backgroundColor, setBackgroundColor] = useState(defaultBackgroundColor);
 
   const handleBackgroundColorChange = (newColor) => {
     setBackgroundColor(newColor);
   };
 
+  const ThemeText = styled.span`
+    color: ${(props) => props.fontColor};
+    font-weight: ${(props) => props.fontWeight};
+    font-size: ${(props) => props.fontSize}px;
+  `;
+
+  const SindhuText = styled.span`
+    color: ${(props) => props.fontColor};
+    font-weight: ${(props) => props.fontWeight};
+    font-size: ${(props) => props.fontSize}px;
+    text-decoration: underline;
+  `;
+
+  const handleFontSizeChange = (newFontSize) => {
+    setFontSize(newFontSize);
+  };
+
   return (
-    <div style={{ backgroundColor: backgroundColor, padding: '200px', textAlign: 'center', color: fontColor || 'white', fontWeight: fontWeight || 'normal' }}>
-      <ThemedDiv fontFamily={fontFamily} fontSize={fontSize} backgroundColor={backgroundColor}>Themes</ThemedDiv>
+    <div style={{ backgroundColor: backgroundColor, padding: '200px', textAlign: 'center' }}>
+      <ThemedDiv fontFamily={fontFamily} fontSize={fontSize} backgroundColor={backgroundColor}>
+        <ThemeText fontColor="white" fontWeight="bold" fontSize={fontSize}>Themes</ThemeText>
+        <SindhuText fontColor="blue" fontWeight="normal" fontSize={fontSize}>sindhu</SindhuText>
+      </ThemedDiv>
       <div>
         <button onClick={() => setFontFamily('Arial, sans-serif')} style={{ margin: '10px', padding: '10px 20px' }}>
           Arial
@@ -45,9 +64,9 @@ const Themes = () => {
         <input
           type="range"
           min="10"
-          max="100"
+          max="1000"
           value={fontSize}
-          onChange={(e) => setFontSize(e.target.value)}
+          onChange={(e) => handleFontSizeChange(e.target.value)}
           style={{ width: '300px' }}
         />
       </div>
