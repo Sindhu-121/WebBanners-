@@ -5,6 +5,7 @@ import { toPng } from 'html-to-image';
 
 const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const editorRef = useRef(null);
 
   const handleTextChange = (index, event) => {
@@ -15,6 +16,12 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
 
   const handleFocus = (index) => {
     setSelectedIndex(index);
+    setSelectedImageIndex(null);
+  };
+
+  const handleImageClick = (index) => {
+    setSelectedImageIndex(index);
+    setSelectedIndex(null);
   };
 
   const handleStyleChange = (index, style, value) => {
@@ -67,6 +74,18 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
     setImages(newImages);
   };
 
+  const handleDelete = () => {
+    if (selectedIndex !== null) {
+      const newTextAreas = textAreas.filter((_, index) => index !== selectedIndex);
+      setTextAreas(newTextAreas);
+      setSelectedIndex(null);
+    } else if (selectedImageIndex !== null) {
+      const newImages = images.filter((_, index) => index !== selectedImageIndex);
+      setImages(newImages);
+      setSelectedImageIndex(null);
+    }
+  };
+
   const handleSave = () => {
     if (editorRef.current) {
       toPng(editorRef.current)
@@ -88,6 +107,7 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
         <button>Back to Menu</button>
       </Link>
       <button onClick={handleSave}>Save</button>
+      <button onClick={handleDelete}>Delete</button>
       {selectedTheme ? (
         <div>
           <h2>Selected Theme</h2>
@@ -118,6 +138,10 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
                     fontFamily: textArea.fontFamily,
                     fontSize: textArea.fontSize,
                     color: textArea.fontColor,
+                    fontWeight: textArea.bold ? 'bold' : 'normal',
+                    fontStyle: textArea.italic ? 'italic' : 'normal',
+                    textDecoration: textArea.underline ? 'underline' : 'none',
+                    textAlign: textArea.textAlign || 'left',
                   }}
                 />
               </Rnd>
@@ -129,8 +153,9 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
                 position={{ x: image.x, y: image.y }}
                 onDragStop={(e, d) => handleImageDragStop(index, e, d)}
                 onResizeStop={(e, direction, ref, delta, position) => handleImageResizeStop(index, e, direction, ref, delta, position)}
+                onClick={() => handleImageClick(index)}
                 style={{
-                  border: '1px solid #ddd',
+                  border: selectedImageIndex === index ? '1px solid black' : 'none',
                 }}
               >
                 <img src={image.src} alt="Uploaded" style={{ width: '100%', height: '100%' }} />
@@ -176,9 +201,46 @@ const ThemeEditor = ({ selectedTheme, textAreas, setTextAreas, images, setImages
                   onChange={(e) => handleStyleChange(selectedIndex, 'backgroundColor', e.target.value)}
                 />
               </label>
+              <label>
+                Text Align:
+                <select
+                  value={textAreas[selectedIndex].textAlign || 'left'}
+                  onChange={(e) => handleStyleChange(selectedIndex, 'textAlign', e.target.value)}
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={textAreas[selectedIndex].bold || false}
+                  onChange={(e) => handleStyleChange(selectedIndex, 'bold', e.target.checked)}
+                />
+                Bold
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={textAreas[selectedIndex].italic || false}
+                  onChange={(e) => handleStyleChange(selectedIndex, 'italic', e.target.checked)}
+                />
+                Italic
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={textAreas[selectedIndex].underline || false}
+                  onChange={(e) => handleStyleChange(selectedIndex, 'underline', e.target.checked)}
+                />
+                Underline
+              </label>
             </div>
           )}
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
+          <div>
+            <input type="file" onChange={handleImageUpload} accept="image/*" />
+          </div>
         </div>
       ) : (
         <p>No theme selected.</p>
