@@ -35,6 +35,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LeftMenu from './LeftMenu';
 import ThemeEditor from './ThemeEditor';
+import Prefilldata from './Prefilldata';
 
 const App = () => {
   const [selectedTheme, setSelectedTheme] = useState(null);
@@ -54,6 +55,7 @@ const App = () => {
         <LeftMenu setSelectedTheme={setSelectedTheme} addTextArea={addTextArea} />
         <Routes>
           <Route path="/editor" element={<ThemeEditor selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} />
+          {/* <Route path="/editor1" element={<Prefilldata selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} /> */}
         </Routes>
       </div>
     </Router>
