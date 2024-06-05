@@ -31,36 +31,86 @@
 // export default App;
 
 
+// import React, { useState } from 'react';
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import LeftMenu from './LeftMenu';
+// import ThemeEditor from './ThemeEditor';
+// import Prefilldata from './Prefilldata';
+
+// const App = () => {
+//   const [selectedTheme, setSelectedTheme] = useState(null);
+//   const [textAreas, setTextAreas] = useState([]);
+//   const [images, setImages] = useState([]);
+
+//   const addTextArea = () => {
+//     setTextAreas([
+//       ...textAreas,
+//       { text: 'New Text', x: 0, y: 0, width: 200, height: 100, fontFamily: 'Arial', fontSize: '16px', fontColor: '#000000', backgroundColor: 'transparent' }
+//     ]);
+//   };
+
+//   return (
+//     <Router>
+//       <div style={{ display: 'flex' }}>
+//         <LeftMenu setSelectedTheme={setSelectedTheme} addTextArea={addTextArea} />
+//         <Routes>
+//           <Route path="/editor" element={<ThemeEditor selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} />
+//           {/* <Route path="/editor1" element={<Prefilldata selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} /> */}
+//         </Routes>
+//       </div>
+//     </Router>
+//   );
+// };
+
+// export default App;
+
+// src/App.js
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LeftMenu from './LeftMenu';
-import ThemeEditor from './ThemeEditor';
-import Prefilldata from './Prefilldata';
+import './App.css';
+import './themes.css';
+import EditableComponent from './EditableComponent';
 
 const App = () => {
-  const [selectedTheme, setSelectedTheme] = useState(null);
-  const [textAreas, setTextAreas] = useState([]);
-  const [images, setImages] = useState([]);
-
-  const addTextArea = () => {
-    setTextAreas([
-      ...textAreas,
-      { text: 'New Text', x: 0, y: 0, width: 200, height: 100, fontFamily: 'Arial', fontSize: '16px', fontColor: '#000000', backgroundColor: 'transparent' }
-    ]);
+  const [theme, setTheme] = useState('theme1');
+  const data = {
+    logo: "path/to/logo.png",
+    examName: "Exam Name",
+    keyPoints: [
+      "Key Point 1",
+      "Key Point 2",
+      "Key Point 3",
+      "Key Point 4",
+      "Key Point 5",
+      "Key Point 6",
+      "Key Point 7",
+      "Key Point 8",
+    ],
+    subject: [
+      "subject-1",
+      "subject-2",
+      "subject-3",
+    ],
+    startdate: "dd/mm/yyyy",
+    enddate: "dd/mm/yyyy",
+    cost: "00,00,000",
+    phone: "123-456-7890",
+    email: "example@example.com",
+    website: "www.example.com",
+    image: "",
   };
 
   return (
-    <Router>
-      <div style={{ display: 'flex' }}>
-        <LeftMenu setSelectedTheme={setSelectedTheme} addTextArea={addTextArea} />
-        <Routes>
-          <Route path="/editor" element={<ThemeEditor selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} />
-          {/* <Route path="/editor1" element={<Prefilldata selectedTheme={selectedTheme} textAreas={textAreas} setTextAreas={setTextAreas} images={images} setImages={setImages} />} /> */}
-        </Routes>
-      </div>
-    </Router>
+    <div className={`App ${theme}`}>
+      <header>
+        <button onClick={() => setTheme('theme1')}>Theme 1</button>
+        <button onClick={() => setTheme('theme2')}>Theme 2</button>
+        <button onClick={() => setTheme('theme3')}>Theme 3</button>
+      </header>
+      <EditableComponent data={data} theme={theme} />
+    </div>
   );
 };
 
 export default App;
+
 

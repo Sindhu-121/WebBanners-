@@ -36,6 +36,12 @@ const ThemeEditor = ({ selectedTheme }) => {
   const [exportWidth, setExportWidth] = useState(800);
   const [exportHeight, setExportHeight] = useState(600);
   const [showExportSettings, setShowExportSettings] = useState(false);
+  const [savedImages, setSavedImages] = useState(
+    JSON.parse(localStorage.getItem("savedImages")) || []
+  );
+  const [currentSavedIndex, setCurrentSavedIndex] = useState(null);
+  const [currentSelectedTheme, setCurrentSelectedTheme] =
+    useState(selectedTheme);
   const handleFocus = (index, type) => {
     setSelectedIndex(type === "text" ? index : null);
     setSelectedImageIndex(type === "image" ? index : null);
@@ -243,16 +249,103 @@ const ThemeEditor = ({ selectedTheme }) => {
         },
       })
         .then((dataUrl) => {
-          const link = document.createElement("a");
-          link.download = "edited-design.png";
-          link.href = dataUrl;
-          link.click();
+          const savedState = {
+            dataUrl,
+            textAreas,
+            images,
+            shapes,
+            selectedTheme, // Save the current theme
+          };
+
+          const newSavedImages = [...savedImages, savedState];
+          localStorage.setItem("savedImages", JSON.stringify(newSavedImages));
+          setSavedImages(newSavedImages);
         })
         .catch((err) => {
           console.error("Error generating image", err);
         });
     }
   };
+
+  const handleSaveEditedDesign = () => {
+    if (editorRef.current && currentSavedIndex !== null) {
+      const originalWidth = editorRef.current.offsetWidth;
+      const originalHeight = editorRef.current.offsetHeight;
+
+      const scale = Math.min(
+        exportWidth / originalWidth,
+        exportHeight / originalHeight
+      );
+
+      toPng(editorRef.current, {
+        width: originalWidth * scale,
+        height: originalHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          width: `${originalWidth}px`,
+          height: `${originalHeight}px`,
+        },
+      })
+        .then((dataUrl) => {
+          const savedState = {
+            dataUrl,
+            textAreas,
+            images,
+            shapes,
+            selectedTheme,
+          };
+
+          const newSavedImages = [...savedImages];
+          newSavedImages[currentSavedIndex] = savedState;
+          localStorage.setItem("savedImages", JSON.stringify(newSavedImages));
+          setSavedImages(newSavedImages);
+        })
+        .catch((err) => {
+          console.error("Error saving edited design", err);
+        });
+    }
+  };
+
+  const handleSavedImageClick = (savedState, index) => {
+    setTextAreas(savedState.textAreas);
+    setImages(savedState.images);
+    setShapes(savedState.shapes);
+    setCurrentSavedIndex(index);
+    setCurrentSelectedTheme(`themes/${savedState.selectedTheme}`); 
+  };
+  
+  // const exportToImage = () => {
+  //   if (editorRef.current) {
+  //     const originalWidth = editorRef.current.offsetWidth;
+  //     const originalHeight = editorRef.current.offsetHeight;
+
+  //     const scale = Math.min(
+  //       exportWidth / originalWidth,
+  //       exportHeight / originalHeight
+  //     );
+
+  //     toPng(editorRef.current, {
+  //       width: originalWidth * scale,
+  //       height: originalHeight * scale,
+  //       style: {
+  //         transform: `scale(${scale})`,
+  //         transformOrigin: "top left",
+  //         width: `${originalWidth}px`,
+  //         height: `${originalHeight}px`,
+  //       },
+  //     })
+  //       .then((dataUrl) => {
+  //         const link = document.createElement("a");
+  //         link.download = "edited-design.png";
+  //         link.href = dataUrl;
+  //         link.click();
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error generating image", err);
+  //       });
+  //   }
+  // };
 
   const handleTextFormatting = (index, key, value) => {
     const newTextAreas = [...textAreas];
@@ -387,27 +480,33 @@ const ThemeEditor = ({ selectedTheme }) => {
             <MdOutlineSaveAlt />
             Export to Image
           </button>
+          <button onClick={handleSaveEditedDesign}>Save Edited Design</button>
         </div>
         {showExportSettings && (
-          <div className="export-settings">
-            <label>
-              Export Width:
-              <input
-                type="number"
-                value={exportWidth}
-                onChange={(e) => setExportWidth(e.target.value)}
-              />
-            </label>
-            <label>
-              Export Height:
-              <input
-                type="number"
-                value={exportHeight}
-                onChange={(e) => setExportHeight(e.target.value)}
-              />
-            </label>
-            <button onClick={exportToImage}>Export</button>
-            <button onClick={() => setShowExportSettings(false)}>Cancel</button>
+          <div className="overlay">
+            <div className="export-settings">
+              <h2>Export Settings</h2>
+              <label>
+                Width:
+                <input
+                  type="number"
+                  value={exportWidth}
+                  onChange={(e) => setExportWidth(parseInt(e.target.value))}
+                />
+              </label>
+              <label>
+                Height:
+                <input
+                  type="number"
+                  value={exportHeight}
+                  onChange={(e) => setExportHeight(parseInt(e.target.value))}
+                />
+              </label>
+              <button onClick={exportToImage}>Export</button>
+              <button onClick={() => setShowExportSettings(false)}>
+                <IoMdClose />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -567,53 +666,6 @@ const ThemeEditor = ({ selectedTheme }) => {
             />
           </Rnd>
         ))}
-        {/* {shapes.map((shape, index) => (
-          <Rnd
-            key={index}
-            size={{ width: shape.width, height: shape.height }}
-            position={{ x: shape.x, y: shape.y }}
-            onDragStop={(e, d) => handleShapeDragStop(index, e, d)}
-            onResizeStop={(e, direction, ref, delta, position) =>
-              handleShapeResizeStop(index, e, direction, ref, delta, position)
-            }
-            bounds="parent"
-            style={{
-              // backgroundColor: shape.fill,
-              border: selectedShapeIndex === index ? "1px solid blue" : "",
-              zIndex: selectedShapeIndex === index ? 1 : 0,
-            }}
-            onClick={() => handleFocus(index, "shape")}
-          >
-            <IconComponent
-              shape={shape}
-              style={{
-                width: shape.width,
-                height: shape.height,
-                border: shape === index ? "1px solid blue" : "",
-                zIndex: selectedShapeIndex === index ? 1 : 0,
-              }}
-            />
-            <input
-              type="range"
-              min="0"
-              max="360"
-              value={shape.rotation}
-              onChange={(e) => handleShapeRotate(index, e.target.value)}
-            />
-            {selectedShapeIndex === index && (
-              <div>
-                <label>Thickness:</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="30"
-                  value={shape.thickness}
-                  onChange={(e) => handleThicknessChange(index, e.target.value)}
-                />
-              </div>
-            )}
-          </Rnd>
-        ))} */}
         {shapes.map((shape, index) => (
           <Rnd
             key={index}
@@ -641,7 +693,12 @@ const ThemeEditor = ({ selectedTheme }) => {
                 }}
               />
               {/* Button for rotation */}
-              <button
+            
+            </div>
+       
+            {selectedShapeIndex === index && (
+              <div>
+                  <button
                 style={{
                   position: "absolute",
                   width: "25px",
@@ -653,35 +710,48 @@ const ThemeEditor = ({ selectedTheme }) => {
                   backgroundColor: "#fff",
                 }}
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent Rnd click event
-                  handleShapeRotate(index, shape.rotation + 5); // Rotate by 45 degrees
+                  e.stopPropagation(); 
+                  handleShapeRotate(index, shape.rotation + 5); 
                 }}
               >
                 <FaArrowRotateLeft />
               </button>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="360"
-              value={shape.rotation}
-              onChange={(e) => handleShapeRotate(index, e.target.value)}
-            />
-            {selectedShapeIndex === index && (
-              <div>
                 <label>Thickness:</label>
                 <input
-                  type="range"
+                  type="number"
                   min="0"
                   max="30"
                   value={shape.thickness}
                   onChange={(e) => handleThicknessChange(index, e.target.value)}
                 />
+                   {/* <label>Rotate:</label>
+                     <input
+              type="range"
+              min="0"
+              max="360"
+              value={shape.rotation}
+              onChange={(e) => handleShapeRotate(index, e.target.value)}
+            /> */}
               </div>
             )}
           </Rnd>
         ))}
       </div>
+      <div>
+  <h3>Saved Designs</h3>
+  <div>
+    {savedImages.map((savedState, index) => (
+      <img
+        key={index}
+        src={savedState.dataUrl}
+        alt={`Saved ${index}`}
+        onClick={() => handleSavedImageClick(savedState, index)}
+        style={{ cursor: "pointer", width: "100px", height: "100px", marginRight: "10px", marginBottom: "10px" }}
+      />
+    ))}
+  </div>
+</div>
+
     </div>
   );
 };

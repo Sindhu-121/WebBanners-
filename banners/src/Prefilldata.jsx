@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { toPng } from "html-to-image";
 import { Rnd } from "react-rnd";
 import { BsFileEarmarkRichtext } from "react-icons/bs";
@@ -20,34 +20,8 @@ import { MdAlternateEmail } from "react-icons/md";
 import { FaPhoneVolume } from "react-icons/fa6";
 import { GrYoutube } from "react-icons/gr";
 import { BsCurrencyRupee } from "react-icons/bs";
-
-const prefillData = {
-  "theme-1.png": {
-    textAreas: [
-      {backgroundImage: "/themes/theme-1.png", x: 50, y: 50, text: "Hello Theme 1", width: 200, height: 100, fontFamily: "Arial", fontSize: "16px", color: "#000", backgroundColor: "transparent", bold: false, italic: false, underline: false, textAlign: "left" }
-    ],
-    images: [
-      { x: 100, y: 100, src: "/images/sample1.png", width: 100, height: 100 }
-    ],
-    shapes: [
-      { x: 150, y: 150, width: 50, height: 50, fill: "black", thickness: 0.2, type: "circle", rotation: 0 }
-    ]
-  },
-  "theme-2.png": {
-    textAreas: [
-      { x: 70, y: 70, text: "Welcome to Theme 2", width: 250, height: 150, fontFamily: "Arial", fontSize: "18px", color: "#333", backgroundColor: "transparent", bold: false, italic: false, underline: false, textAlign: "left", backgroundImage: "/theams/theme-2.png" }
-    ],
-    images: [
-      { x: 120, y: 120, src: "/images/sample2.png", width: 120, height: 120 }
-    ],
-    shapes: [
-      { x: 170, y: 170, width: 60, height: 60, fill: "blue", thickness: 0.3, type: "square", rotation: 0 }
-    ]
-  }
-  // Add more themes as needed
-};
-
-const Prefilldata = ({ selectedTheme }) => {
+import { FaArrowRotateLeft } from "react-icons/fa6";
+const ThemeEditor = ({ selectedTheme }) => {
   const [textAreas, setTextAreas] = useState([]);
   const [images, setImages] = useState([]);
   const [shapes, setShapes] = useState([]);
@@ -59,18 +33,9 @@ const Prefilldata = ({ selectedTheme }) => {
   const editorRef = useRef(null);
   const [showAllShapes, setShowAllShapes] = useState(false);
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [exportWidth, setExportWidth] = useState(800); 
-  const [exportHeight, setExportHeight] = useState(600); 
+  const [exportWidth, setExportWidth] = useState(800);
+  const [exportHeight, setExportHeight] = useState(600);
   const [showExportSettings, setShowExportSettings] = useState(false);
-
-  useEffect(() => {
-    if (selectedTheme && prefillData[selectedTheme]) {
-      setTextAreas(prefillData[selectedTheme].textAreas || []);
-      setImages(prefillData[selectedTheme].images || []);
-      setShapes(prefillData[selectedTheme].shapes || []);
-    }
-  }, [selectedTheme]);
-
   const handleFocus = (index, type) => {
     setSelectedIndex(type === "text" ? index : null);
     setSelectedImageIndex(type === "image" ? index : null);
@@ -89,41 +54,40 @@ const Prefilldata = ({ selectedTheme }) => {
     newTextAreas[index].height = ref.style.height;
     setTextAreas(newTextAreas);
   };
-
   const addSocialMediaIcon = (iconType) => {
     let iconUrl = "";
     let shapeType = "";
     switch (iconType) {
       case "facebook":
-        iconUrl = "https://facebook.com";
+        iconUrl = "https://facebook.com"; // Replace with actual URL
         shapeType = "facebook";
         break;
       case "twitter":
-        iconUrl = "https://twitter.com";
+        iconUrl = "https://twitter.com"; // Replace with actual URL
         shapeType = "twitter";
         break;
       case "instagram":
-        iconUrl = "https://instagram.com";
+        iconUrl = "https://instagram.com"; // Replace with actual URL
         shapeType = "instagram";
         break;
       case "youtube":
-        iconUrl = "https://youtube.com";
+        iconUrl = "https://youtube.com"; // Replace with actual URL
         shapeType = "youtube";
         break;
       case "rupee":
-        iconUrl = "https://youtube.com";
+        iconUrl = "https://youtube.com"; // Replace with actual URL
         shapeType = "rupee";
         break;
       case "phone":
-        iconUrl = "https://instagram.com";
+        iconUrl = "https://instagram.com"; // Replace with actual URL
         shapeType = "phone";
         break;
       case "attherate":
-        iconUrl = "https://instagram.com";
+        iconUrl = "https://instagram.com"; // Replace with actual URL
         shapeType = "attherate";
         break;
       case "mail":
-        iconUrl = "https://instagram.com";
+        iconUrl = "https://instagram.com"; // Replace with actual URL
         shapeType = "mail";
         break;
       default:
@@ -171,7 +135,6 @@ const Prefilldata = ({ selectedTheme }) => {
     newShapes[index].y = d.y;
     setShapes(newShapes);
   };
-
   const handleShapeRotate = (index, rotation) => {
     const newShapes = [...shapes];
     newShapes[index].rotation = rotation;
@@ -239,123 +202,219 @@ const Prefilldata = ({ selectedTheme }) => {
 
   const handleDelete = () => {
     if (selectedIndex !== null) {
-      setTextAreas(textAreas.filter((_, index) => index !== selectedIndex));
+      const newTextAreas = [...textAreas];
+      newTextAreas.splice(selectedIndex, 1);
+      setTextAreas(newTextAreas);
       setSelectedIndex(null);
     } else if (selectedImageIndex !== null) {
-      setImages(images.filter((_, index) => index !== selectedImageIndex));
+      const newImages = [...images];
+      newImages.splice(selectedImageIndex, 1);
+      setImages(newImages);
       setSelectedImageIndex(null);
     } else if (selectedShapeIndex !== null) {
-      setShapes(shapes.filter((_, index) => index !== selectedShapeIndex));
+      const newShapes = [...shapes];
+      newShapes.splice(selectedShapeIndex, 1);
+      setShapes(newShapes);
       setSelectedShapeIndex(null);
     }
   };
 
-  const handleExport = async () => {
-    if (!editorRef.current) return;
-    const dataUrl = await toPng(editorRef.current, { width: exportWidth, height: exportHeight });
-    const link = document.createElement("a");
-    link.download = "image.png";
-    link.href = dataUrl;
-    link.click();
+  const handleExportClick = () => {
+    setShowExportSettings(true);
+  };
+  const exportToImage = () => {
+    if (editorRef.current) {
+      const originalWidth = editorRef.current.offsetWidth;
+      const originalHeight = editorRef.current.offsetHeight;
+
+      const scale = Math.min(
+        exportWidth / originalWidth,
+        exportHeight / originalHeight
+      );
+
+      toPng(editorRef.current, {
+        width: originalWidth * scale,
+        height: originalHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          width: `${originalWidth}px`,
+          height: `${originalHeight}px`,
+        },
+      })
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.download = "edited-design.png";
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch((err) => {
+          console.error("Error generating image", err);
+        });
+    }
+  };
+
+  const handleTextFormatting = (index, key, value) => {
+    const newTextAreas = [...textAreas];
+    newTextAreas[index][key] = value;
+    setTextAreas(newTextAreas);
+  };
+  const handleEditorClick = (event) => {
+    const rect = editorRef.current.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    if (addingText) {
+      const newTextAreas = [
+        ...textAreas,
+        {
+          text: "New Text",
+          x,
+          y,
+          width: 200,
+          height: 50,
+          fontFamily: "Arial",
+          fontSize: "16px",
+          fontColor: "#000000",
+          backgroundColor: "transparent",
+          bold: false,
+          italic: false,
+          underline: false,
+          textAlign: "left",
+        },
+      ];
+      setTextAreas(newTextAreas);
+      setAddingText(false);
+    } else if (addingImage) {
+      document.getElementById("imageUploadInput").click();
+      setAddingImage(false);
+    }
+  };
+  const handleToggleShapes = () => {
+    setShowAllShapes((prevShowAllShapes) => !prevShowAllShapes);
+  };
+  const handleToggleIcons = () => {
+    setShowAllIcons((prevShowAllIcons) => !prevShowAllIcons);
+  };
+
+  const handleThicknessChange = (index, thickness) => {
+    const newShapes = [...shapes];
+    newShapes[index].thickness = thickness;
+    setShapes(newShapes);
   };
 
   return (
-    <div className="editor">
-      <div className="toolbar">
-        <button onClick={() => setAddingText(true)}>
-          <BsFileEarmarkRichtext />
-        </button>
-        <button onClick={() => setAddingImage(true)}>
-          <RiUploadCloud2Fill />
-        </button>
-        <div className="shapes-toolbar">
-          <button onClick={() => setShowAllShapes(!showAllShapes)}>
-            <FaShapes />
+    <div>
+      <div>
+        <h1>Theme Editor</h1>
+        <div>
+          <button onClick={addTextArea}>
+            <BsFileEarmarkRichtext />
+            Add Text
           </button>
-          {showAllShapes && (
-            <div className="shapes-dropdown">
-              <button onClick={() => handleShapeAdd("square")}>
-                <FiSquare />
-              </button>
-              <button onClick={() => handleShapeAdd("circle")}>
-                <FiCircle />
-              </button>
-              <button onClick={() => handleShapeAdd("triangle")}>
-                <FiTriangle />
-              </button>
-              <button onClick={() => handleShapeAdd("star")}>
-                <FiStar />
-              </button>
-              <button onClick={() => handleShapeAdd("arrow")}>
-                <FiArrowUp />
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="icons-toolbar">
-          <button onClick={() => setShowAllIcons(!showAllIcons)}>
-            <FaIcons />
+          <button>
+            <input
+              type="file"
+              onChange={(e) => addImage(URL.createObjectURL(e.target.files[0]))}
+            />
+            <RiUploadCloud2Fill />
+            {/* Add Image */}
           </button>
-          {showAllIcons && (
-            <div className="icons-dropdown">
-              <button onClick={() => addSocialMediaIcon("facebook")}>
-                <FaFacebook />
-              </button>
-              <button onClick={() => addSocialMediaIcon("twitter")}>
-                <FaTwitter />
-              </button>
-              <button onClick={() => addSocialMediaIcon("instagram")}>
-                <FaInstagram />
-              </button>
-              <button onClick={() => addSocialMediaIcon("youtube")}>
-                <GrYoutube />
-              </button>
-              <button onClick={() => addSocialMediaIcon("rupee")}>
-                <BsCurrencyRupee />
-              </button>
-              <button onClick={() => addSocialMediaIcon("phone")}>
-                <FaPhoneVolume />
-              </button>
-              <button onClick={() => addSocialMediaIcon("attherate")}>
-                <MdAlternateEmail />
-              </button>
-              <button onClick={() => addSocialMediaIcon("mail")}>
-                <IoIosMail />
-              </button>
-            </div>
-          )}
+          <div>
+            {showAllShapes && (
+              <div>
+                <h2>Add Shapes</h2>
+                <button onClick={() => handleShapeAdd("square")}>
+                  <FiSquare />
+                </button>
+                <button onClick={() => handleShapeAdd("circle")}>
+                  <FiCircle />
+                </button>
+                <button onClick={() => handleShapeAdd("triangle")}>
+                  <FiTriangle />
+                </button>
+                <button onClick={() => handleShapeAdd("star")}>
+                  <FiStar />
+                </button>
+                <button onClick={() => handleShapeAdd("arrowUp")}>
+                  <FiArrowUp />
+                </button>
+              </div>
+            )}
+            <button onClick={handleToggleShapes}>
+              {showAllShapes ? "close" : <FaShapes />}
+            </button>
+          </div>
+          <div>
+            {showAllIcons && (
+              <div>
+                <h2>Add Social Media Icons</h2>
+                <button onClick={() => addSocialMediaIcon("facebook")}>
+                  <FaFacebook />
+                </button>
+                <button onClick={() => addSocialMediaIcon("twitter")}>
+                  <FaTwitter />
+                </button>
+                <button onClick={() => addSocialMediaIcon("instagram")}>
+                  <FaInstagram />
+                </button>
+                <button onClick={() => addSocialMediaIcon("youtube")}>
+                  <GrYoutube />
+                </button>
+                <button onClick={() => addSocialMediaIcon("rupee")}>
+                  <BsCurrencyRupee />
+                </button>
+                <button onClick={() => addSocialMediaIcon("phone")}>
+                  <FaPhoneVolume />
+                </button>
+                <button onClick={() => addSocialMediaIcon("attherate")}>
+                  <MdAlternateEmail />
+                </button>
+                <button onClick={() => addSocialMediaIcon("mail")}>
+                  <IoIosMail />
+                </button>
+              </div>
+            )}
+            <button onClick={handleToggleIcons}>
+              {showAllIcons ? "close" : <FaIcons />}
+            </button>
+          </div>
+          <button onClick={handleDelete}>
+            <MdDelete />
+            Delete
+          </button>
+          <button onClick={handleExportClick}>
+            <MdOutlineSaveAlt />
+            Export to Image
+          </button>
         </div>
-        <button onClick={handleDelete}>
-          <MdDelete />
-        </button>
-        <button onClick={handleExport}>
-          <MdOutlineSaveAlt />
-        </button>
-        <button onClick={() => setShowExportSettings(!showExportSettings)}>
-          Export Settings
-        </button>
         {showExportSettings && (
           <div className="export-settings">
             <label>
-              Width:
+              Export Width:
               <input
                 type="number"
                 value={exportWidth}
-                onChange={(e) => setExportWidth(parseInt(e.target.value))}
+                onChange={(e) => setExportWidth(e.target.value)}
               />
             </label>
             <label>
-              Height:
+              Export Height:
               <input
                 type="number"
                 value={exportHeight}
-                onChange={(e) => setExportHeight(parseInt(e.target.value))}
+                onChange={(e) => setExportHeight(e.target.value)}
               />
             </label>
+            <button onClick={exportToImage}>Export</button>
+            <button onClick={() => setShowExportSettings(false)}>Cancel</button>
           </div>
         )}
       </div>
-      <div className="editor-content" ref={editorRef} style={{
+      <div
+        onClick={handleEditorClick}
+        ref={editorRef}
+        style={{
           width: "230%",
           height: "110%",
           // border: "1px solid black",
@@ -364,26 +423,30 @@ const Prefilldata = ({ selectedTheme }) => {
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundSize: "100%",
-        }}>
-    
+        }}
+      >
         {textAreas.map((textArea, index) => (
           <Rnd
             key={index}
-            bounds="parent"
             size={{ width: textArea.width, height: textArea.height }}
             position={{ x: textArea.x, y: textArea.y }}
             onDragStop={(e, d) => handleDragStop(index, e, d)}
             onResizeStop={(e, direction, ref, delta, position) =>
               handleResizeStop(index, e, direction, ref, delta, position)
             }
+            bounds="parent"
+            style={{
+              border: selectedIndex === index ? "1px solid blue" : "",
+              zIndex: selectedIndex === index ? 1 : 0,
+            }}
             onClick={() => handleFocus(index, "text")}
           >
             <textarea
               value={textArea.text}
               onChange={(e) => handleTextChange(index, e)}
               style={{
-                width: textArea.width,
-                height: textArea.height,
+                width: "100%",
+                height: "100%",
                 fontFamily: textArea.fontFamily,
                 fontSize: textArea.fontSize,
                 color: textArea.color,
@@ -394,77 +457,276 @@ const Prefilldata = ({ selectedTheme }) => {
                 textAlign: textArea.textAlign,
               }}
             />
+            {selectedIndex === index && (
+              <div>
+                <select
+                  value={textArea.fontFamily}
+                  onChange={(e) =>
+                    handleTextFormatting(index, "fontFamily", e.target.value)
+                  }
+                >
+                  <option value="Arial">Arial</option>
+                  <option value="Courier New">Courier New</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Verdana">Verdana</option>
+                </select>
+                <input
+                  type="number"
+                  value={parseInt(textArea.fontSize, 10)}
+                  onChange={(e) =>
+                    handleTextFormatting(
+                      index,
+                      "fontSize",
+                      `${e.target.value}px`
+                    )
+                  }
+                />
+                <input
+                  type="color"
+                  value={textArea.color}
+                  onChange={(e) =>
+                    handleTextFormatting(index, "color", e.target.value)
+                  }
+                />
+                <input
+                  type="color"
+                  value={textArea.backgroundColor}
+                  onChange={(e) =>
+                    handleTextFormatting(
+                      index,
+                      "backgroundColor",
+                      e.target.value
+                    )
+                  }
+                />
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={textArea.bold}
+                    onChange={(e) =>
+                      handleTextFormatting(index, "bold", e.target.checked)
+                    }
+                  />
+                  Bold
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={textArea.italic}
+                    onChange={(e) =>
+                      handleTextFormatting(index, "italic", e.target.checked)
+                    }
+                  />
+                  Italic
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={textArea.underline}
+                    onChange={(e) =>
+                      handleTextFormatting(index, "underline", e.target.checked)
+                    }
+                  />
+                  Underline
+                </label>
+                <select
+                  value={textArea.textAlign}
+                  onChange={(e) =>
+                    handleTextFormatting(index, "textAlign", e.target.value)
+                  }
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+            )}
           </Rnd>
         ))}
         {images.map((image, index) => (
           <Rnd
             key={index}
-            bounds="parent"
             size={{ width: image.width, height: image.height }}
             position={{ x: image.x, y: image.y }}
             onDragStop={(e, d) => handleImageDragStop(index, e, d)}
             onResizeStop={(e, direction, ref, delta, position) =>
               handleImageResizeStop(index, e, direction, ref, delta, position)
             }
+            bounds="parent"
+            style={{
+              border: selectedImageIndex === index ? "1px solid blue" : "",
+              zIndex: selectedImageIndex === index ? 1 : 0,
+            }}
             onClick={() => handleFocus(index, "image")}
           >
-            <img src={image.src} alt="" style={{ width: "100%", height: "100%" }} />
+            <img
+              src={image.src}
+              alt=""
+              style={{ width: "100%", height: "100%" }}
+            />
           </Rnd>
         ))}
-        {shapes.map((shape, index) => (
+        {/* {shapes.map((shape, index) => (
           <Rnd
             key={index}
-            bounds="parent"
             size={{ width: shape.width, height: shape.height }}
             position={{ x: shape.x, y: shape.y }}
             onDragStop={(e, d) => handleShapeDragStop(index, e, d)}
             onResizeStop={(e, direction, ref, delta, position) =>
               handleShapeResizeStop(index, e, direction, ref, delta, position)
             }
+            bounds="parent"
+            style={{
+              // backgroundColor: shape.fill,
+              border: selectedShapeIndex === index ? "1px solid blue" : "",
+              zIndex: selectedShapeIndex === index ? 1 : 0,
+            }}
+            onClick={() => handleFocus(index, "shape")}
+          >
+            <IconComponent
+              shape={shape}
+              style={{
+                width: shape.width,
+                height: shape.height,
+                border: shape === index ? "1px solid blue" : "",
+                zIndex: selectedShapeIndex === index ? 1 : 0,
+              }}
+            />
+            <input
+              type="range"
+              min="0"
+              max="360"
+              value={shape.rotation}
+              onChange={(e) => handleShapeRotate(index, e.target.value)}
+            />
+            {selectedShapeIndex === index && (
+              <div>
+                <label>Thickness:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  value={shape.thickness}
+                  onChange={(e) => handleThicknessChange(index, e.target.value)}
+                />
+              </div>
+            )}
+          </Rnd>
+        ))} */}
+        {shapes.map((shape, index) => (
+          <Rnd
+            key={index}
+            size={{ width: shape.width, height: shape.height }}
+            position={{ x: shape.x, y: shape.y }}
+            onDragStop={(e, d) => handleShapeDragStop(index, e, d)}
+            onResizeStop={(e, direction, ref, delta, position) =>
+              handleShapeResizeStop(index, e, direction, ref, delta, position)
+            }
+            bounds="parent"
+            style={{
+              border: selectedShapeIndex === index ? "1px solid blue" : "",
+              zIndex: selectedShapeIndex === index ? 1 : 0,
+            }}
             onClick={() => handleFocus(index, "shape")}
           >
             <div
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: shape.fill,
-                transform: `rotate(${shape.rotation}deg)`,
-              }}
+              style={{ position: "relative", width: "100%", height: "100%" }}
             >
-              {shape.type === "square" && <FiSquare />}
-              {shape.type === "circle" && <FiCircle />}
-              {shape.type === "triangle" && <FiTriangle />}
-              {shape.type === "star" && <FiStar />}
-              {shape.type === "arrow" && <FiArrowUp />}
-              {shape.type === "facebook" && <FaFacebook />}
-              {shape.type === "twitter" && <FaTwitter />}
-              {shape.type === "instagram" && <FaInstagram />}
-              {shape.type === "youtube" && <GrYoutube />}
-              {shape.type === "rupee" && <BsCurrencyRupee />}
-              {shape.type === "phone" && <FaPhoneVolume />}
-              {shape.type === "attherate" && <MdAlternateEmail />}
-              {shape.type === "mail" && <IoIosMail />}
+              <IconComponent
+                shape={shape}
+                style={{
+                  width: shape.width,
+                  height: shape.height,
+                }}
+              />
+              {/* Button for rotation */}
+              <button
+                style={{
+                  position: "absolute",
+                  width: "25px",
+                  height: "25px",
+                  top: "-20px",
+                  right: "-30px",
+                  border: "1px solid #000",
+                  borderRadius: "50%",
+                  backgroundColor: "#fff",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent Rnd click event
+                  handleShapeRotate(index, shape.rotation + 5); // Rotate by 45 degrees
+                }}
+              >
+                <FaArrowRotateLeft />
+              </button>
             </div>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              value={shape.rotation}
+              onChange={(e) => handleShapeRotate(index, e.target.value)}
+            />
+            {selectedShapeIndex === index && (
+              <div>
+                <label>Thickness:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  value={shape.thickness}
+                  onChange={(e) => handleThicknessChange(index, e.target.value)}
+                />
+              </div>
+            )}
           </Rnd>
         ))}
       </div>
-      {addingText && <button onClick={addTextArea}>Add Text Area</button>}
-      {addingImage && (
-        <div>
-          <input
-            type="text"
-            placeholder="Enter image URL"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                addImage(e.target.value);
-              }
-            }}
-          />
-          <button onClick={() => setAddingImage(false)}>Cancel</button>
-        </div>
-      )}
     </div>
   );
 };
 
-export default Prefilldata;
+const IconComponent = ({ shape }) => {
+  const iconProps = {
+    key: shape.type,
+    size: shape.width,
+    color: shape.fill,
+    style: {
+      strokeWidth: shape.thickness, // Use the thickness for icon stroke width
+      transform: `rotate(${shape.rotation}deg)`, // Apply rotation
+    },
+  };
+
+  switch (shape.type) {
+    case "facebook":
+      return <FaFacebook {...iconProps} />;
+    case "twitter":
+      return <FaTwitter {...iconProps} />;
+    case "instagram":
+      return <FaInstagram {...iconProps} />;
+    case "square":
+      return <FiSquare {...iconProps} />;
+    case "circle":
+      return <FiCircle {...iconProps} />;
+    case "triangle":
+      return <FiTriangle {...iconProps} />;
+    case "star":
+      return <FiStar {...iconProps} />;
+    case "arrowUp":
+      return <FiArrowUp {...iconProps} />;
+    case "phone":
+      return <FaPhoneVolume {...iconProps} />;
+    case "mail":
+      return <IoIosMail {...iconProps} />;
+    case "attherate":
+      return <MdAlternateEmail {...iconProps} />;
+    case "youtube":
+      return <GrYoutube {...iconProps} />;
+    case "rupee":
+      return <BsCurrencyRupee {...iconProps} />;
+    default:
+      return null;
+  }
+};
+
+export default ThemeEditor;

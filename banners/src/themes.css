@@ -1,0 +1,91 @@
+/* src/themes.css */
+.theme1 .editable-container {
+    width: 100%;
+    background-image: url("themes/theme-1.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .theme1 .editable-container .logo { 
+    width: 100px;
+    height: auto;
+  }
+  
+  .theme2 .editable-container {
+    background-image: url("themes/theme-2.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  }
+  
+  .theme3 .editable-container {
+    background-image: url("themes/theme-4.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+  }
+  
+/* .theme1 {
+    width: 100%;
+    background-image: url("themes/theme-1.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.theme2 {
+  background-image: url("themes/theme-2.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+.theme3 {
+  background-image: url("themes/theme-4.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+} */
+
+
+/* .logo {
+    width: 100px;
+    height: auto;
+  } */
+  
+  .editable-container {
+    padding: 20px;
+    /* border-radius: 10px; */
+    text-align: center;
+  }
+  
+  .editable-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .editable-container li {
+    margin-bottom: 10px;
+  }
+  
+  .editable-container input[type="text"],
+  .editable-container input[type="email"] {
+    width: calc(100% - 10px);
+    padding: 5px;
+  }
+
+
+  .uploaded-image {
+    width: 200px;
+    height: auto;
+    margin-top: 20px;
+  }
+  .draggable {
+    position: absolute;
+    cursor: move;
+  }
