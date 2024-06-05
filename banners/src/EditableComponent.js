@@ -28,6 +28,9 @@ const EditableComponent = ({ data,theme  }) => {
 //     }));
 //   };
 
+
+
+
   return (
     <div className={`editable-container ${theme}`}>
       {/* <Draggable

@@ -38,26 +38,3 @@
 }
 
 
-/* App.css */
-body, html, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
-
-#root {
-  display: flex;
-}
-
-.left-menu {
-  width: 20%;
-  background-color: #f4f4f4;
-  padding: 10px;
-}
-
-.editor {
-  width: 80%;
-  padding: 10px;
-}
-
