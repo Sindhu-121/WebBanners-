@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./BannerEditor.css";
 import api from "./api/api";
-
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 const BannerEditor = () => {
   const [svgContent, setSVGContent] = useState("");
   const [selectedElement, setSelectedElement] = useState(null);
@@ -16,6 +16,9 @@ const BannerEditor = () => {
   const [showPosters, setShowPoster] = useState(false);
   const [posters, setPosters] = useState([]);
   const [selectedPosterId, setSelectedPosterId] = useState(null);
+  const [startBannerIndex, setStartBannerIndex] = useState(0);
+
+
   useEffect(() => {
     fetchBanners();
   }, []);
@@ -43,17 +46,6 @@ const BannerEditor = () => {
       console.error("Error fetching posters:", error);
     }
   };
-
-  // const handleFileUpload = (event) => {
-  //   const file = event.target.files[0];
-  //   const reader = new FileReader();
-
-  //   reader.onload = (e) => {
-  //     setSVGContent(e.target.result);
-  //   };
-
-  //   reader.readAsText(file);
-  // };
 
   const handleElementClick = (event) => {
     let target = event.target;
@@ -168,23 +160,24 @@ const BannerEditor = () => {
       document.addEventListener("mouseup", onMouseUp);
     }
   };
-
   const renderControls = () => {
     if (!editMode || !selectedElement) return null;
-
+ 
     const rect = selectedElement.getBoundingClientRect();
     return (
       <div
         className="controls"
         style={{
+          margin: "2rem",
+          width: "300px",
           position: "absolute",
-          top: rect.top + window.scrollY,
-          left: rect.left + window.scrollX,
+          left: "16rem",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           border: "1px solid #ccc",
           padding: "5px",
           borderRadius: "5px",
           zIndex: 1000,
+          textalign: "center",
         }}
       >
         {selectedElement.tagName === "image" ? (
@@ -224,34 +217,57 @@ const BannerEditor = () => {
     setSVGContent(atob(bannerContent));
     setSelectedBannerId(bannerId);
     setEditMode(false);
+    if (svgRef.current) {
+      svgRef.current.classList.add('selected-banner');
+    }
   };
-
+  
   const handlePosterClick = (posterContent, posterId) => {
     setSVGContent(atob(posterContent));
     setSelectedPosterId(posterId);
     setEditMode(false);
+    if (svgRef.current) {
+      svgRef.current.classList.add('selected-poster');
+    }
   };
 
   const toggleShowBanners = () => {
-    setShowBanners(true);
+    setShowBanners(!showBanners);
+    if (showBanners) {
     setShowPoster(false);
     setSVGContent("");
-    setSelectedBannerId(null);
+    setSelectedBannerId(null); 
+    setSelectedElement(null);  
+  }
   };
   
   const toggleShowposter = () => {
+    setShowPoster(!showPosters);
+    if (showPosters) {
     setShowBanners(false);
-    setShowPoster(true);
     setSVGContent("");
     setSelectedPosterId(null);
+    setSelectedElement(null);
+   }
   };
   
+  const handleLeftButtonClick = () => {
+    if (startBannerIndex > 0) {
+      setStartBannerIndex(startBannerIndex - 4);
+    }
+  };
 
+  const handleRightButtonClick = () => {
+    if (startBannerIndex + 4 < banners.length) {
+      setStartBannerIndex(startBannerIndex + 4);
+    }
+  };
   return (
     <div className="BannerEditor">
       <div>
-        <h1>Web Banners</h1>
-        {message && <p>{message}</p>}
+        {/* <h1>Web Banners</h1> */}
+        {/* {message && <p>{message}</p>} */}
+        <div style={{display:"flex",gap:"1rem"}}>
         <button
           onClick={toggleShowBanners}
           style={{
@@ -277,10 +293,15 @@ const BannerEditor = () => {
           }}
         >
           {showPosters ? "Hide Poster" : "Show Poster"}
-        </button>
+        </button></div>
+      
         {showBanners && (
+          
           <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {banners.map((banner) => (
+            <button onClick={handleLeftButtonClick} style={{background:"none",
+              border:"none"
+            }}> <FaArrowLeft style={{ fontSize: "24px" }}/></button>
+            {banners.slice(startBannerIndex, startBannerIndex  + 4).map((banner) => (
               <div
                 key={banner.banner_Id}
                 style={{ margin: "10px" }}
@@ -291,14 +312,21 @@ const BannerEditor = () => {
                 <img
                   src={`data:image/svg+xml;base64,${banner.banner}`}
                   alt={`Banner ${banner.banner_Id}`}
-                  style={{ width: "200px", height: "200px", cursor: "pointer" }}
+                  style={{ width: "500px", height: "300px", cursor: "pointer" }}
                 />
               </div>
             ))}
+            <button onClick={handleRightButtonClick} style={{background:"none",
+              border:"none"
+            }}> <FaArrowRight style={{ fontSize: "24px" }} /></button>
           </div>
-        )}
+        )} 
+         
         {showPosters && (
           <div style={{ display: "flex", flexWrap: "wrap" }}>
+            <button onClick={handleLeftButtonClick} style={{background:"none",
+              border:"none"
+            }}> <FaArrowLeft style={{ fontSize: "24px" }}/></button>
             {posters.map((poster) => (
               <div
                 key={poster.web_poster_id}
@@ -317,17 +345,12 @@ const BannerEditor = () => {
                 />
               </div>
             ))}
+                <button onClick={handleRightButtonClick} style={{background:"none",
+              border:"none"
+            }}> <FaArrowRight style={{ fontSize: "24px" }} /></button>
           </div>
         )}
       </div>
-      <div
-        ref={svgRef}
-        className="img-container"
-        dangerouslySetInnerHTML={{ __html: svgContent }}
-        onClick={handleElementClick}
-        contentEditable={editMode}
-        onMouseDown={handleMouseDown}
-      />
       {renderControls()}
       <button
         onClick={toggleEditMode}
@@ -355,6 +378,16 @@ const BannerEditor = () => {
       >
         Save
       </button>
+      <div
+        ref={svgRef}
+        className="img-container"
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+        onClick={handleElementClick}
+        contentEditable={editMode}
+        onMouseDown={handleMouseDown}
+      />
+      
+   
     </div>
   );
 };
