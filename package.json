@@ -2,5 +2,15 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "react-resizable": "^3.0.5"
-  }
+  },
+  "name": "webbanners-",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }

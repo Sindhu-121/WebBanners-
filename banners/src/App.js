@@ -200,6 +200,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import BannerEditor from './BannerEditor';
+import UploadBanner from './UploadBanner';
 
 
 const App = () => {
@@ -208,6 +209,7 @@ const App = () => {
       <div>
         <Routes>
          <Route path="/"  element={<BannerEditor/>}/>
+         <Route path="/webbanners" element={<UploadBanner/>}/>
         </Routes>
       </div>
     </Router>
